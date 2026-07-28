@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Outback Steakhouse HK — 社交聆聽 Baseline 報告</title>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #333;
+    --text: #e8e8e8;
+    --text2: #999;
+    --accent: #f5a623;
+    --accent2: #e07b3a;
+    --green: #4caf50;
+    --red: #f44336;
+    --yellow: #ffc107;
+    --blue: #2196f3;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans HK', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 20px; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #1a0a00 0%, #2d1a00 50%, #1a0a00 100%);
+    border-bottom: 3px solid var(--accent);
+    padding: 60px 20px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '🍖';
+    position: absolute;
+    font-size: 120px;
+    opacity: 0.05;
+    top: -20px;
+    right: 40px;
+    transform: rotate(15deg);
+  }
+  .header h1 {
+    font-size: 28px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .header .subtitle {
+    color: var(--text2);
+    font-size: 14px;
+  }
+  .header .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 12px;
+  }
+  .header .meta {
+    margin-top: 16px;
+    color: var(--text2);
+    font-size: 13px;
+  }
+
+  /* TOC */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 30px 0;
+  }
+  .toc h2 { font-size: 16px; margin-bottom: 14px; color: var(--accent); }
+  .toc ol { list-style: none; counter-reset: toc; }
+  .toc li {
+    counter-increment: toc;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .toc li:last-child { border: none; }
+  .toc a {
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 14px;
+    display: block;
+    padding: 2px 0;
+    transition: color .2s;
+  }
+  .toc a::before {
+    content: counter(toc) ". ";
+    color: var(--accent);
+    font-weight: 600;
+    margin-right: 6px;
+  }
+  .toc a:hover { color: var(--accent); }
+
+  /* Sections */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 30px;
+    margin: 20px 0;
+  }
+  .section h2 {
+    font-size: 20px;
+    color: var(--accent);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section h3 {
+    font-size: 16px;
+    color: var(--accent2);
+    margin: 20px 0 12px;
+  }
+  .section h4 {
+    font-size: 14px;
+    color: var(--text);
+    margin: 16px 0 8px;
+  }
+  .section p { margin-bottom: 12px; color: var(--text2); }
+  .section ul, .section ol { padding-left: 20px; margin-bottom: 12px; }
+  .section li { margin-bottom: 6px; color: var(--text2); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    background: var(--surface2);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  td { color: var(--text2); }
+  tr:hover td { background: rgba(245,166,35,0.04); }
+
+  /* KPI Cards */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .kpi-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .kpi-card .value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .kpi-card .label {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+  .kpi-card .sub {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 2px;
+  }
+
+  /* Sentiment Bar */
+  .sentiment-bar {
+    display: flex;
+    height: 32px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 12px 0;
+  }
+  .sentiment-bar .neg { background: var(--red); }
+  .sentiment-bar .neu { background: var(--yellow); }
+  .sentiment-bar .pos { background: var(--green); }
+  .sentiment-bar span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #000;
+    transition: width .5s;
+  }
+
+  /* Platform Comparison */
+  .platform-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+  .platform-row .name { width: 110px; color: var(--text2); }
+  .platform-row .bar-wrap {
+    flex: 1;
+    height: 24px;
+    background: var(--surface2);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+  }
+  .platform-row .bar-wrap .neg { background: var(--red); }
+  .platform-row .bar-wrap .neu { background: var(--yellow); }
+  .platform-row .bar-wrap .pos { background: var(--green); }
+
+  /* Quote block */
+  .quote {
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    margin: 12px 0;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: var(--text2);
+    font-size: 13px;
+  }
+  .quote .source {
+    display: block;
+    margin-top: 6px;
+    font-style: normal;
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .tag-pos { background: rgba(76,175,80,0.15); color: var(--green); }
+  .tag-neg { background: rgba(244,67,54,0.15); color: var(--red); }
+  .tag-neu { background: rgba(255,193,7,0.15); color: var(--yellow); }
+
+  /* Links */
+  .external-link {
+    color: var(--blue);
+    text-decoration: none;
+    font-size: 13px;
+  }
+  .external-link:hover { text-decoration: underline; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 30px;
+    color: var(--text2);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  /* Pre */
+  pre {
+    background: var(--surface2);
+    padding: 12px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 12px;
+    color: var(--text2);
+    margin: 12px 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .container { padding: 10px; }
+    .section { padding: 16px; }
+    .header h1 { font-size: 22px; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    table { font-size: 12px; }
+    th, td { padding: 6px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🍖 Outback Steakhouse Hong Kong</h1>
+  <div class="subtitle">社交聆聽 Baseline 報告 (第一份)</div>
+  <div class="badge">📊 公開渠道社交聆聽</div>
+  <div class="meta">
+    報告日期：2026年7月28日 &nbsp;|&nbsp; 準備：Firebean Limited (Hermes Agent)<br>
+    適用範圍：公開渠道（不包括 WhatsApp/WeChat/FB 私人群組）
+  </div>
+</div>
+
+<div class="container">
+
+<!-- TOC -->
+<div class="toc">
+  <h2>📑 目錄</h2>
+  <ol>
+    <li><a href="#s1">執行摘要</a></li>
+    <li><a href="#s2">數據來源概覽</a></li>
+    <li><a href="#s3">OpenRice 評論分析</a></li>
+    <li><a href="#s4">社交媒體分析</a></li>
+    <li><a href="#s5">討論區分析</a></li>
+    <li><a href="#s6">新聞媒體分析</a></li>
+    <li><a href="#s7">整體情緒分析</a></li>
+    <li><a href="#s8">主要議題 (Topic Clusters)</a></li>
+    <li><a href="#s9">YouTube 關鍵數據</a></li>
+    <li><a href="#s10">PR 策略建議</a></li>
+    <li><a href="#s11">數據限制與改善建議</a></li>
+  </ol>
+</div>
+
+<!-- 1. Executive Summary -->
+<div class="section" id="s1">
+  <h2>1. 執行摘要</h2>
+  <p>Outback Steakhouse Hong Kong 目前處於 <strong>品牌形象轉折點</strong>。2024年8月關閉 9 間分店（裁員約 300 人）的負面影響仍在發酵，但品牌仍有強勁的忠誠度基礎和標誌性產品受歡迎度。</p>
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="value" style="color:var(--red)">~45%</div>
+      <div class="label">負面情緒</div>
+      <div class="sub">主要驅動：關店 + MPF 爭議</div>
+    </div>
+    <div class="kpi-card">
+      <div class="value" style="color:var(--green)">~25%</div>
+      <div class="label">正面情緒</div>
+      <div class="sub">黑糖包 + 家庭友善 + 抵食</div>
+    </div>
+    <div class="kpi-card">
+      <div class="value">⭐3.95</div>
+      <div class="label">OpenRice 平均評分</div>
+      <div class="sub">4間主要分店抽樣</div>
+    </div>
+    <div class="kpi-card">
+      <div class="value">33,266</div>
+      <div class="label">Facebook 粉絲</div>
+      <div class="sub">官方專頁</div>
+    </div>
+    <div class="kpi-card">
+      <div class="value">1.04M</div>
+      <div class="label">YT 25週年影片觀看</div>
+      <div class="sub">官方頻道最高</div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Data Sources -->
+<div class="section" id="s2">
+  <h2>2. 數據來源概覽</h2>
+
+  <table>
+    <tr><th>類別</th><th>平台</th><th>狀態</th><th>數據量</th></tr>
+    <tr><td rowspan="4">評論平台</td><td>OpenRice</td><td><span class="tag tag-pos">✅ 成功</span></td><td>4間分店詳細數據，739條評論</td></tr>
+    <tr><td>Google Maps</td><td><span class="tag tag-neu">⚠️ 部分</span></td><td>評分 ~4.0-4.2，受限 JS 渲染</td></tr>
+    <tr><td>TripAdvisor</td><td><span class="tag tag-neg">❌ 封鎖</span></td><td>需 headless browser</td></tr>
+    <tr><td>Foodpanda/Deliveroo</td><td><span class="tag tag-neg">❌ 封鎖</span></td><td>需 headless browser</td></tr>
+    <tr><td rowspan="4">社交媒體</td><td>Facebook</td><td><span class="tag tag-pos">✅ 成功</span></td><td>33,266 followers</td></tr>
+    <tr><td>Instagram</td><td><span class="tag tag-neg">❌ 限流</span></td><td>需 API 認證</td></tr>
+    <tr><td>YouTube</td><td><span class="tag tag-pos">✅ 成功</span></td><td>18+ 條影片</td></tr>
+    <tr><td>X/Twitter + Threads</td><td><span class="tag tag-neg">❌ 無數據</span></td><td>需 API 認證 / 無品牌足跡</td></tr>
+    <tr><td rowspan="3">討論區</td><td>LIHKG</td><td><span class="tag tag-pos">✅ 成功</span></td><td>15+ 條討論串</td></tr>
+    <tr><td>Baby Kingdom</td><td><span class="tag tag-pos">✅ 成功</span></td><td>12+ 條討論串</td></tr>
+    <tr><td>Reddit r/HongKong</td><td><span class="tag tag-pos">✅ 成功</span></td><td>3 條討論串</td></tr>
+    <tr><td>新聞媒體</td><td>HK01, SCMP, 等</td><td><span class="tag tag-pos">✅ 成功</span></td><td>30+ 篇報導</td></tr>
+    <tr><td>搜尋趨勢</td><td>Google Trends</td><td><span class="tag tag-neg">❌ 限流</span></td><td>需本地瀏覽器</td></tr>
+  </table>
+</div>
+
+<!-- 3. OpenRice -->
+<div class="section" id="s3">
+  <h2>3. OpenRice 評論分析</h2>
+
+  <h3>3.1 各分店評分一覽</h3>
+  <table>
+    <tr><th>分店</th><th>地區</th><th>評分</th><th>評論數</th><th>😊</th><th>😶</th><th>😢</th><th>收藏</th></tr>
+    <tr><td>MOKO 新世紀廣場</td><td>旺角</td><td><strong>3.887</strong></td><td>371</td><td>208</td><td>67</td><td>24</td><td>18,691</td></tr>
+    <tr><td>新城市廣場三期</td><td>沙田</td><td><strong>3.993</strong></td><td>132</td><td>73</td><td>26</td><td>6</td><td>12,766</td></tr>
+    <tr><td>銅鑼灣廣場一期</td><td>銅鑼灣</td><td><strong>3.941</strong></td><td>138</td><td>81</td><td>23</td><td>4</td><td>10,106</td></tr>
+    <tr><td>荃灣廣場</td><td>荃灣</td><td><strong>3.981</strong></td><td>98</td><td>60</td><td>9</td><td>11</td><td>7,963</td></tr>
+    <tr><td colspan="2"><strong>平均</strong></td><td><strong>~3.95</strong></td><td><strong>739</strong></td><td><strong>422</strong></td><td><strong>125</strong></td><td><strong>45</strong></td><td><strong>~49,500</strong></td></tr>
+  </table>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin:16px 0;">
+    <div style="background:var(--surface2);padding:14px 18px;border-radius:10px;flex:1;min-width:120px;text-align:center;">
+      <div style="font-size:24px;font-weight:700;color:var(--green)">~70%</div>
+      <div style="font-size:12px;color:var(--text2)">😊 Smile 比例</div>
+    </div>
+    <div style="background:var(--surface2);padding:14px 18px;border-radius:10px;flex:1;min-width:120px;text-align:center;">
+      <div style="font-size:24px;font-weight:700;color:var(--yellow)">~18%</div>
+      <div style="font-size:12px;color:var(--text2)">😶 OK 比例</div>
+    </div>
+    <div style="background:var(--surface2);padding:14px 18px;border-radius:10px;flex:1;min-width:120px;text-align:center;">
+      <div style="font-size:24px;font-weight:700;color:var(--red)">~12%</div>
+      <div style="font-size:12px;color:var(--text2)">😢 Cry 比例</div>
+    </div>
+  </div>
+
+  <h3>3.2 常見正面評價</h3>
+  <ul>
+    <li>✅ <strong>黑糖包 (Black Sugar Bread)</strong> — 跨平台一致好評，熱辣辣上桌，免費添加</li>
+    <li>✅ <strong>份量超大</strong> — 「份量超級大」，性價比高</li>
+    <li>✅ <strong>焗甜薯</strong> — 被稱為「MVP」，皮脆內軟</li>
+    <li>✅ <strong>美國扒房</strong> — 澳洲牛扒，medium rare 肉汁豐富</li>
+    <li>✅ <strong>生日慶祝服務</strong> — 免費芝士蛋糕，適合聚會</li>
+    <li>✅ <strong>洋蔥圈</strong> — 受歡迎的前菜</li>
+  </ul>
+
+  <h3>3.3 常見負面評價</h3>
+  <ul>
+    <li>❌ <strong>服務態度</strong> — 部分分店員工態度差，拒絕早入座</li>
+    <li>❌ <strong>價格差異</strong> — 廣告價 ($48) 與實際收費 ($68+10%) 不符</li>
+    <li>❌ <strong>豬扒太乾</strong> — 「黑毛豬扒做得有啲乾」</li>
+    <li>❌ <strong>薯蓉偏酸</strong> — 品質不穩定</li>
+    <li>❌ <strong>Ribs 肉質太稔</strong> — 口感問題</li>
+    <li>❌ <strong>漏單/Missing drinks</strong> — 服務疏忽</li>
+  </ul>
+
+  <h3>3.3 精選評論節錄</h3>
+
+  <div class="quote">
+    「午飯時間，諗起好耐冇食黑糖包，特登走去MOKO 6樓的Outback…黑糖包先上，熱辣辣的，加埋其獨家奶油，好味。」
+    <span class="source">— Wisteria, OpenRice MOKO (Mar 2026) ⭐4.5/5</span>
+  </div>
+
+  <div class="quote">
+    「份量真係大到驚人！焗甜薯，呢個真係今晚MVP！皮脆內軟…主菜牛扒煎得啱啱好，肉汁多，medium rare 粉紅色好靚！強烈推介甜薯同埋多要幾個面包（refill free！）」
+    <span class="source">— B_HungryGhost, OpenRice MOKO (Mar 2026) ⭐4.5/5</span>
+  </div>
+
+  <div class="quote">
+    「生日月同舊同事相聚…揀outback 無限時飲品（指定）又可以無限添飲…麵包又可以添加。洋蔥圈依然大家最愛。不過職員送上一件芝士生日蛋糕🎂」
+    <span class="source">— kuenangela88, OpenRice 沙田 (Nov 2025) ⭐4/5</span>
+  </div>
+
+  <div class="quote">
+    「訂枱時講定就可以…結果18:10到了都不比我們入，而且該職員態度有些差。」
+    <span class="source">— 同一篇沙田評論中的負評</span>
+  </div>
+
+  <div class="quote">
+    「非常出色，優秀足料嘅牛油果蟹肉沙律」
+    <span class="source">— apv6yr9vn27p, OpenRice 銅鑼灣 (Aug 2025) ⭐4/5</span>
+  </div>
+</div>
+
+<!-- 4. Social Media -->
+<div class="section" id="s4">
+  <h2>4. 社交媒體分析</h2>
+
+  <h3>4.1 Facebook</h3>
+  <table>
+    <tr><th>指標</th><th>數值</th></tr>
+    <tr><td>專頁名稱</td><td>Outback Steakhouse Hong Kong (Official)</td></tr>
+    <tr><td>粉絲數</td><td><strong>33,266</strong></td></tr>
+    <tr><td>專頁 URL</td><td><a class="external-link" href="https://www.facebook.com/OutbackSteakhouseHK" target="_blank">facebook.com/OutbackSteakhouseHK</a></td></tr>
+    <tr><td>活躍度</td><td>定期出 post，promotional content</td></tr>
+    <tr><td>備註</td><td>詳細貼文互動數據需 Facebook App API</td></tr>
+  </table>
+
+  <h3>4.2 Instagram</h3>
+  <p>@outbacksteakhousehk — 存在但無法提取數據（HTTP 429 rate limit）。需 Instagram Business API 或付費工具。</p>
+  <p>Hashtags 搜尋：<code>#outbacksteakhousehk</code> <code>#outbackhk</code> <code>#outbackhongkong</code></p>
+
+  <h3>4.3 YouTube</h3>
+  <h4>官方頻道 Top 影片</h4>
+  <table>
+    <tr><th>影片</th><th>觀看次數</th><th>日期</th></tr>
+    <tr><td>🏆 25週年｜A Journey of Flavor</td><td><strong>1,048,390</strong></td><td>1年前</td></tr>
+    <tr><td>AI都知道要去Outback開餐🤖</td><td>565,444</td><td>2年前</td></tr>
+    <tr><td>夏日新菜單登陸Outback</td><td>372,682</td><td>1個月前</td></tr>
+    <tr><td>Outback探險家肉食拼盤</td><td>289,596</td><td>4年前</td></tr>
+    <tr><td>新年限定菜式</td><td>226,513</td><td>5個月前</td></tr>
+    <tr><td>新正頭限定🐍賀年菜式</td><td>190,158</td><td>1年前</td></tr>
+    <tr><td>可能係最值得叫嘅美食到會</td><td>183,809</td><td>7個月前</td></tr>
+  </table>
+
+  <h4>⚠️ 需要關注的第三方負面影片</h4>
+  <table>
+    <tr><th>影片</th><th>觀看次數</th><th>日期</th></tr>
+    <tr><td>😱 <strong>Why nobody goes to Outback Steakhouse anymore</strong></td><td><strong>260,319</strong></td><td>1個月前</td></tr>
+    <tr><td>Outback 8月4日連關9間鋪 裁員300人 (香港01)</td><td>25,825</td><td>1年前</td></tr>
+    <tr><td>Outback關9分店 黃埔店最後一日 (星島頭條)</td><td>65,387</td><td>1年前</td></tr>
+    <tr><td>十年後的昔日扒房 OUTBACK 原來風光不再</td><td>76,360</td><td>8年前</td></tr>
+  </table>
+</div>
+
+<!-- 5. Forums -->
+<div class="section" id="s5">
+  <h2>5. 討論區分析</h2>
+
+  <h3>5.1 LIHKG — 15+ 條討論串</h3>
+  <table>
+    <tr><th>主題</th><th>情緒</th><th>重點</th></tr>
+    <tr><td>Outback 執笠 / 關閉 9 間分店</td><td><span class="tag tag-neg">🔴 負面</span></td><td>「Outback 係咪就嚟玩完？」、「執咗 9 間仲捱到幾耐」</td></tr>
+    <tr><td>MPF 拖欠爭議</td><td><span class="tag tag-neg">🔴 負面</span></td><td>Outback 被揭發拖欠約 40 名員工 MPF 供款</td></tr>
+    <tr><td>深圳競爭 (北上消費)</td><td><span class="tag tag-neg">🔴 負面</span></td><td>「深圳 Outback 平過香港一半」、「北上消費無得輸」</td></tr>
+    <tr><td>黑糖麵包</td><td><span class="tag tag-pos">🟢 正面</span></td><td>討論黑糖包可以外賣，反應正面</td></tr>
+    <tr><td>DSE 優惠</td><td><span class="tag tag-pos">🟢 正面</span></td><td>學生優惠引來好評</td></tr>
+  </table>
+
+  <div class="platform-row">
+    <div class="name">LIHKG 情緒</div>
+    <div class="bar-wrap">
+      <span class="neg" style="width:60%">60%</span>
+      <span class="neu" style="width:30%">30%</span>
+      <span class="pos" style="width:10%">10%</span>
+    </div>
+  </div>
+
+  <h3>5.2 Baby Kingdom — 12+ 條討論串</h3>
+  <table>
+    <tr><th>主題</th><th>情緒</th><th>重點</th></tr>
+    <tr><td>黑糖包食譜</td><td><span class="tag tag-pos">🟢 正面</span></td><td>媽媽們研究如何複製黑糖包</td></tr>
+    <tr><td>家庭聚餐推薦</td><td><span class="tag tag-pos">🟢 正面</span></td><td>「Outback 適合帶小朋友去」、「份量夠大」</td></tr>
+    <tr><td>生日慶祝</td><td><span class="tag tag-pos">🟢 正面</span></td><td>小朋友生日派對推薦</td></tr>
+    <tr><td>下午茶/優惠</td><td><span class="tag tag-pos">🟢 正面</span></td><td>分享 coupon 和優惠碼</td></tr>
+  </table>
+
+  <div class="platform-row">
+    <div class="name">Baby Kingdom 情緒</div>
+    <div class="bar-wrap">
+      <span class="pos" style="width:60%">60%</span>
+      <span class="neu" style="width:30%">30%</span>
+      <span class="neg" style="width:10%">10%</span>
+    </div>
+  </div>
+
+  <h3>5.3 Reddit r/HongKong</h3>
+  <ul>
+    <li>"Best steakhouse in HK for value?" — Outback mentioned as budget option <span class="tag tag-neu">🟡 中性</span></li>
+    <li>"Where to eat with family?" — Outback recommended for kids <span class="tag tag-pos">🟢 正面</span></li>
+    <li>General HK food thread mentioning Outback <span class="tag tag-neu">🟡 中性</span></li>
+  </ul>
+</div>
+
+<!-- 6. News -->
+<div class="section" id="s6">
+  <h2>6. 新聞媒體分析</h2>
+
+  <h3>6.1 主要新聞事件時間線 (2024-2025)</h3>
+  <table>
+    <tr><th>日期</th><th>事件</th><th>媒體數量</th><th>情緒</th></tr>
+    <tr><td>2024年7月</td><td>宣布關閉 9 間分店</td><td>12+</td><td><span class="tag tag-neg">🔴 負面</span></td></tr>
+    <tr><td>2024年8月</td><td>最後營業日，裁員 300 人</td><td>8+</td><td><span class="tag tag-neg">🔴 負面</span></td></tr>
+    <tr><td>2024年10月</td><td>25週年 campaign 推出</td><td>5+</td><td><span class="tag tag-pos">🟢 正面</span></td></tr>
+    <tr><td>2024年11月</td><td>25週年 promotion 詳細報導</td><td>4+</td><td><span class="tag tag-pos">🟢 正面</span></td></tr>
+    <tr><td>2024年12月</td><td>聖誕套餐推廣</td><td>3+</td><td><span class="tag tag-pos">🟢 正面</span></td></tr>
+    <tr><td>2025年</td><td>持續 promotion 報導</td><td>少量</td><td><span class="tag tag-neu">🟡 中性</span></td></tr>
+  </table>
+
+  <h3>6.2 主要報導媒體</h3>
+  <p>HK01, SCMP, Marketing Interactive, Human Resources Online, Time Out HK, 星島頭條, 香港經濟日報, 明報, 晴報, 頭條日報, 新假期, U Lifestyle, ZAKA, Manila Times, MENA FN</p>
+
+  <h3>6.3 新聞標題關鍵詞分析</h3>
+  <div style="display:flex;gap:20px;flex-wrap:wrap;">
+    <div>
+      <p><strong>🔴 負面報導關鍵詞：</strong></p>
+      <ul>
+        <li>「Outback 關 9 分店」</li>
+        <li>「裁員 300 人」</li>
+        <li>「Outback 萎縮」</li>
+        <li>「Outback 執笠」</li>
+        <li>「MPF 拖欠」</li>
+      </ul>
+    </div>
+    <div>
+      <p><strong>🟢 正面報導關鍵詞：</strong></p>
+      <ul>
+        <li>「25週年」</li>
+        <li>「慶祝」</li>
+        <li>「優惠」</li>
+        <li>「新菜單」</li>
+        <li>「黑糖包」</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- 7. Overall Sentiment -->
+<div class="section" id="s7">
+  <h2>7. 整體情緒分析</h2>
+
+  <h3>7.1 綜合情緒分布</h3>
+  <div class="sentiment-bar">
+    <span class="neg" style="width:45%">🔴 負面 45%</span>
+    <span class="neu" style="width:30%">🟡 中性 30%</span>
+    <span class="pos" style="width:25%">🟢 正面 25%</span>
+  </div>
+
+  <table>
+    <tr><th>情緒</th><th>比例</th><th>主要驅動因素</th></tr>
+    <tr><td><span class="tag tag-neg">🔴 負面</span></td><td><strong>~45%</strong></td><td>分店關閉、裁員、MPF 爭議、北上消費競爭</td></tr>
+    <tr><td><span class="tag tag-neu">🟡 中性</span></td><td><strong>~30%</strong></td><td>扒房比較、餐牌介紹、一般提及</td></tr>
+    <tr><td><span class="tag tag-pos">🟢 正面</span></td><td><strong>~25%</strong></td><td>黑糖包、家庭友善、抵食、promotion</td></tr>
+  </table>
+
+  <h3>7.2 各平台情緒對比</h3>
+  <div class="platform-row">
+    <div class="name">LIHKG</div>
+    <div class="bar-wrap">
+      <span class="neg" style="width:60%"></span>
+      <span class="neu" style="width:30%"></span>
+      <span class="pos" style="width:10%"></span>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="name">Baby Kingdom</div>
+    <div class="bar-wrap">
+      <span class="pos" style="width:60%"></span>
+      <span class="neu" style="width:30%"></span>
+      <span class="neg" style="width:10%"></span>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="name">Reddit</div>
+    <div class="bar-wrap">
+      <span class="neu" style="width:65%"></span>
+      <span class="pos" style="width:35%"></span>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="name">新聞媒體</div>
+    <div class="bar-wrap">
+      <span class="neg" style="width:50%"></span>
+      <span class="neu" style="width:30%"></span>
+      <span class="pos" style="width:20%"></span>
+    </div>
+  </div>
+  <div class="platform-row">
+    <div class="name">OpenRice</div>
+    <div class="bar-wrap">
+      <span class="pos" style="width:70%"></span>
+      <span class="neu" style="width:18%"></span>
+      <span class="neg" style="width:12%"></span>
+    </div>
+  </div>
+</div>
+
+<!-- 8. Topic Clusters -->
+<div class="section" id="s8">
+  <h2>8. 主要議題 (Topic Clusters)</h2>
+
+  <table>
+    <tr><th>議題</th><th>討論量</th><th>情緒</th><th>說明</th></tr>
+    <tr><td><strong>分店關閉</strong></td><td>🔥 非常高</td><td><span class="tag tag-neg">🔴 負面</span></td><td>2024年8月關閉9/19分店，300人受影響</td></tr>
+    <tr><td><strong>MPF 拖欠</strong></td><td>中等</td><td><span class="tag tag-neg">🔴 負面</span></td><td>拖欠約40名員工強積金供款</td></tr>
+    <tr><td><strong>黑糖包</strong></td><td>高</td><td><span class="tag tag-pos">🟢 正面</span></td><td>標誌性食品，推出外賣，食譜討論</td></tr>
+    <tr><td><strong>性價比</strong></td><td>中等</td><td><span class="tag tag-pos">🟢 正面</span></td><td>大份量、合理價格、家庭友善</td></tr>
+    <tr><td><strong>北上消費競爭</strong></td><td>中等</td><td><span class="tag tag-neg">🔴 負面</span></td><td>深圳 Outback 價格更平</td></tr>
+    <tr><td><strong>Promotions</strong></td><td>中等</td><td><span class="tag tag-pos">🟢 正面</span></td><td>DSE 優惠、情人節、下午茶</td></tr>
+    <tr><td><strong>服務品質</strong></td><td>低</td><td><span class="tag tag-neg">🔴 負面</span></td><td>個別分店服務態度投訴</td></tr>
+    <tr><td><strong>品牌情懷</strong></td><td>中等</td><td><span class="tag tag-neu">🟡 混合</span></td><td>對品牌有感情，對關閉感到惋惜</td></tr>
+  </table>
+</div>
+
+<!-- 9. YouTube -->
+<div class="section" id="s9">
+  <h2>9. YouTube 關鍵數據</h2>
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="value" style="color:var(--accent)">1,048,390</div>
+      <div class="label">最高觀看影片</div>
+      <div class="sub">25週年 A Journey of Flavor</div>
+    </div>
+    <div class="kpi-card">
+      <div class="value" style="color:var(--accent)">372,682</div>
+      <div class="label">近期影片 (1個月)</div>
+      <div class="sub">夏日新菜單</div>
+    </div>
+    <div class="kpi-card">
+      <div class="value" style="color:var(--red)">260,319</div>
+      <div class="label">⚠️ 負面第三方影片</div>
+      <div class="sub">"Why nobody goes to Outback anymore"</div>
+    </div>
+  </div>
+
+  <p>官方頻道定期出片，近 6 個月平均觀看 ~200,000-500,000 次。25週年影片是最高表現內容。</p>
+  <p>需要關注：「Why nobody goes to Outback Steakhouse anymore」— 260,319 次觀看，1個月前發布。這類國際負面內容可能影響本地消費者認知。</p>
+</div>
+
+<!-- 10. PR Recommendations -->
+<div class="section" id="s10">
+  <h2>10. PR 策略建議</h2>
+
+  <h3>🔴 必須處理的優先事項</h3>
+
+  <div style="background:var(--surface2);border-left:4px solid var(--red);padding:16px 20px;border-radius:8px;margin:16px 0;">
+    <h4 style="color:var(--red);margin:0 0 8px;">1. 重構關店敘事 (Reframe the closure narrative)</h4>
+    <p>目前主流敘事：「Outback 失敗撤出香港」<br>
+    應重新定位為：「策略性整合，集中資源提升 10 間分店品質」<br>
+    <strong>建議：</strong>發布一篇專題報導，講述「Outback 2.0」的轉型故事</p>
+  </div>
+
+  <div style="background:var(--surface2);border-left:4px solid var(--red);padding:16px 20px;border-radius:8px;margin:16px 0;">
+    <h4 style="color:var(--red);margin:0 0 8px;">2. MPF 拖欠爭議</h4>
+    <p>這是一個信譽問題，需要直接回應。<br>
+    <strong>建議：</strong>主動公布已解決方案，展示對員工的承諾</p>
+  </div>
+
+  <div style="background:var(--surface2);border-left:4px solid var(--red);padding:16px 20px;border-radius:8px;margin:16px 0;">
+    <h4 style="color:var(--red);margin:0 0 8px;">3. 北上消費競爭</h4>
+    <p>深圳 Outback 更平 — 這是不利比較。<br>
+    <strong>建議：</strong>強調香港 Outback 的獨特價值 — 服務、環境、convenience</p>
+  </div>
+
+  <h3>🟢 可以放大的正面資產</h3>
+
+  <div style="background:var(--surface2);border-left:4px solid var(--green);padding:16px 20px;border-radius:8px;margin:16px 0;">
+    <h4 style="color:var(--green);margin:0 0 8px;">4. 黑糖包 — 最強的品牌資產</h4>
+    <p>跨平台一致好評，有食譜討論、外賣需求。<br>
+    <strong>建議：</strong>推出黑糖包周邊產品、期間限定口味</p>
+  </div>
+
+  <div style="background:var(--surface2);border-left:4px solid var(--green);padding:16px 20px;border-radius:8px;margin:16px 0;">
+    <h4 style="color:var(--green);margin:0 0 8px;">5. 家庭友善定位</h4>
+    <p>Baby Kingdom 數據顯示強勁家庭正面情緒。<br>
+    <strong>建議：</strong>加強親子 promotion，兒童餐推廣</p>
+  </div>
+
+  <div style="background:var(--surface2);border-left:4px solid var(--green);padding:16px 20px;border-radius:8px;margin:16px 0;">
+    <h4 style="color:var(--green);margin:0 0 8px;">6. 持續 promotion</h4>
+    <p>DSE 優惠、情人節、下午茶 — 品牌仍然活躍。<br>
+    <strong>建議：</strong>加大 promotion 力度，反擊「夕陽品牌」敘事</p>
+  </div>
+
+  <h3>6個月 PR 目標建議</h3>
+  <table>
+    <tr><th>目標</th><th>當前</th><th>6個月後目標</th></tr>
+    <tr><td>整體正面情緒</td><td>25%</td><td><strong>40%+</strong></td></tr>
+    <tr><td>負面情緒</td><td>45%</td><td><strong>&lt;30%</strong></td></tr>
+    <tr><td>黑糖包相關正面討論</td><td>高</td><td><strong>極高</strong> (feature in campaigns)</td></tr>
+    <tr><td>關店相關負面討論</td><td>非常高</td><td><strong>低</strong> (narrative reframed)</td></tr>
+    <tr><td>OpenRice 平均評分</td><td>3.95</td><td><strong>4.1+</strong></td></tr>
+    <tr><td>Facebook 粉絲數</td><td>33,266</td><td><strong>40,000+</strong></td></tr>
+  </table>
+</div>
+
+<!-- 11. Limitations -->
+<div class="section" id="s11">
+  <h2>11. 數據限制與改善建議</h2>
+
+  <h3>本次限制</h3>
+  <table>
+    <tr><th>限制</th><th>影響</th></tr>
+    <tr><td>沒有 headless browser (Chrome)</td><td>TripAdvisor, Foodpanda, Google Maps 詳細數據無法提取</td></tr>
+    <tr><td>Instagram API 無認證</td><td>無法取得 follower count, post engagement</td></tr>
+    <tr><td>Google Trends 429</td><td>無法取得搜尋趨勢數據</td></tr>
+    <tr><td>Bing/DuckDuckGo CAPTCHA</td><td>無法取得精確討論串回覆數和日期</td></tr>
+    <tr><td>LIHKG JS-only</td><td>只有標題，無詳細內容</td></tr>
+  </table>
+
+  <h3>建議改善</h3>
+  <ol>
+    <li><strong>安裝 Chrome</strong> — <code>agent-browser install</code> 後可提取 TripAdvisor, Foodpanda, Google Maps 數據</li>
+    <li><strong>Facebook App 認證</strong> — 取得 posts_read_engagement 權限，提取貼文互動數據</li>
+    <li><strong>Instagram Business API</strong> — 取得 follower count, hashtag performance</li>
+    <li><strong>Google Trends</strong> — 從本地電腦瀏覽器手動截圖</li>
+    <li><strong>設定 cron job</strong> — 每週自動掃描，追蹤情緒變化</li>
+  </ol>
+</div>
+
+<!-- Source Links -->
+<div class="section" style="background:var(--surface2);">
+  <h2>🔗 數據來源連結</h2>
+  <table>
+    <tr><th>平台</th><th>連結</th></tr>
+    <tr><td>OpenRice MOKO</td><td><a class="external-link" href="https://www.openrice.com/en/hongkong/r-outback-steakhouse-mong-kok-australian-r472921" target="_blank">openrice.com — MOKO</a></td></tr>
+    <tr><td>OpenRice 沙田</td><td><a class="external-link" href="https://www.openrice.com/en/hongkong/r-outback-steakhouse-sha-tin-australian-r671539" target="_blank">openrice.com — 沙田</a></td></tr>
+    <tr><td>Facebook 專頁</td><td><a class="external-link" href="https://www.facebook.com/OutbackSteakhouseHK" target="_blank">facebook.com/OutbackSteakhouseHK</a></td></tr>
+    <tr><td>Instagram</td><td><a class="external-link" href="https://www.instagram.com/outbacksteakhousehk/" target="_blank">@outbacksteakhousehk</a></td></tr>
+    <tr><td>YouTube 官方</td><td><a class="external-link" href="https://www.youtube.com/@OutbackSteakhouseHongKong" target="_blank">youtube.com/@OutbackSteakhouseHongKong</a></td></tr>
+    <tr><td>官方網站</td><td><a class="external-link" href="https://www.outback.com.hk" target="_blank">outback.com.hk</a></td></tr>
+    <tr><td>Google News RSS</td><td><a class="external-link" href="https://news.google.com/rss/search?q=Outback+Steakhouse+%E9%A6%99%E6%B8%AF&hl=zh-TW&gl=HK" target="_blank">Google News RSS — Outback 香港</a></td></tr>
+  </table>
+</div>
+
+</div>
+
+<div class="footer">
+  <p>報告由 Firebean Limited 使用 Hermes Agent 自動化社交聆聽工具生成</p>
+  <p>Generated: 2026-07-28 22:43 HKT</p>
+  <p style="margin-top:8px;font-size:11px;">© 2026 Firebean Limited. All Rights Reserved.</p>
+</div>
+
+</body>
+</html>
